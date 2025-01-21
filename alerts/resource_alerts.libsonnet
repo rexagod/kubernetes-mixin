@@ -34,10 +34,10 @@
           } +
           if $._config.showMultiCluster then {
             expr: |||
-              (count(kube_node_info) == 1
+              (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
+              0.85 * sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) > 0
               and
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
-              sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) > 0)
+              count by (cluster) (max by (cluster, node) (kube_node_info)) == 1)
               or
               (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
               (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) -
@@ -51,10 +51,10 @@
             },
           } else {
             expr: |||
-              (count(kube_node_info) == 1
+              (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
+              0.85 * sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) > 0
               and
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
-              sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) > 0)
+              count(max by (node) (kube_node_info)) == 1)
               or
               (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
               (sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) -
@@ -79,10 +79,10 @@
           } +
           if $._config.showMultiCluster then {
             expr: |||
-              (count(kube_node_info) == 1
+              (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
+              0.85 * sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) > 0
               and
-              sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
-              sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) > 0)
+              count by (cluster) (max by (cluster, node) (kube_node_info)) == 1)
               or
               (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
               (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) -
@@ -96,10 +96,10 @@
             },
           } else {
             expr: |||
-              (count(kube_node_info) == 1
+              (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
+              0.85 * sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) > 0
               and
-              sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
-              sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) > 0)
+              count(max by (node) (kube_node_info)) == 1)
               or
               (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
               (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) -
